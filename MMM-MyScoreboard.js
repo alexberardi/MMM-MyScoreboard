@@ -513,7 +513,12 @@ Module.register("MMM-MyScoreboard",{
     this.config.sports.forEach(function(sport, index) {
       if (self.sportsData[index] != null && self.sportsData[index].length > 0) {
         anyGames = true;
+        self.sportsData[index].forEach(function(game, gidx) {
         if (self.config.showLeagueSeparators) {
+					
+          var gameDiv = document.createElement("div");
+					gameDiv.classList.add("hiddenGame");
+
           var leagueSeparator = document.createElement("div");
           leagueSeparator.classList.add("league-separator");
           if (sport.label) {
@@ -521,12 +526,12 @@ Module.register("MMM-MyScoreboard",{
           } else {
             leagueSeparator.innerHTML = "<span>" + sport.league + "</span>";
           }
-          wrapper.appendChild(leagueSeparator);
+					gameDiv.appendChild(leagueSeparator);
         }
-        self.sportsData[index].forEach(function(game, gidx) {
           var boxScore = self.boxScoreFactory(sport.league, game);
           boxScore.classList.add(gidx % 2 == 0 ? "odd" : "even") ;
-          wrapper.appendChild(boxScore);
+          gameDiv.appendChild(boxScore);
+					wrapper.appendChild(gameDiv);
         });
       }
     });
@@ -556,6 +561,7 @@ Module.register("MMM-MyScoreboard",{
     }
   },
 
+	currentIndex: 0,
   start: function() {
     Log.info("Starting module: " + this.name);
 
@@ -588,6 +594,7 @@ Module.register("MMM-MyScoreboard",{
     */
 
     this.getScores();
+		console.log(this.currentIndex);
 
     /*
       As of v2.0, poll interval is no longer configurable.
@@ -602,6 +609,24 @@ Module.register("MMM-MyScoreboard",{
     setInterval(function() {
       self.getScores();
     }, 2 * 60 * 1000);
+		setInterval(function() {
+			var wrapper = document.getElementsByClassName("wrapper");
+			var gameDivs = wrapper[0].childNodes;
+			var shownGame = document.getElementsByClassName("showGame")[0];
+			if (shownGame)
+			{
+				shownGame.classList.remove("showGame");
+				shownGame.classList.add("hiddenGame"); 
+			}
+
+			if (self.currentIndex === gameDivs.length -1){
+				self.currentIndex = 0; 
+			} else {
+				self.currentIndex++; 
+			}
+			gameDivs[self.currentIndex].classList.remove("hiddenGame");
+			gameDivs[self.currentIndex].classList.add("showGame");
+		}, 3000);
 
   },
 
@@ -664,7 +689,6 @@ Module.register("MMM-MyScoreboard",{
       };
 
       self.sendSocketNotification("MMM-MYSCOREBOARD-GET-SCORES", payload);
-
 
     });
 

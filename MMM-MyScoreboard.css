@@ -82,6 +82,14 @@
   filter: none;
 }
 
+.hiddenGame {
+	display: none;
+}
+
+.shownGame {
+	display: block;
+}
+
 
 .MMM-MyScoreboard .box-score .logo.visitor {
   left: 0px;
